@@ -4,35 +4,31 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users")
-public class User {
+@Table(name = "customers")
+public class Customer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
-    List<Customer> customers;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    @Column(name ="name")
+    @Column(name = "name")
     private String name;
 
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(name = "email_id")
-    private String email;
-
-    @Column(name = "business_category")
-    private String category;
+    @Column(name = "address")
+    private String address;
 
     @Column(name = "created_at")
     @CreationTimestamp
     private Date createdAt;
-
 }
