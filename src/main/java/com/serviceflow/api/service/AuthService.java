@@ -4,7 +4,7 @@ import com.serviceflow.api.dto.registerdto.RegisterDTO;
 import com.serviceflow.api.entity.User;
 import com.serviceflow.api.repository.UserRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -12,27 +12,34 @@ import java.time.LocalDateTime;
 @Service
 public class AuthService {
 
-    private BCryptPasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     UserRepository userRepository;
 
-    public AuthService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder){
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService){
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     @Transactional
     public void register(RegisterDTO registerDTO) {
-        if (userRepository.findByPhoneNumber(registerDTO.getPhoneNumber()).isPresent()) {
-            throw new RuntimeException("User already exists with phone number: ******" + registerDTO.getPhoneNumber().substring(6));
+        if (userRepository.findByPhoneNumber(registerDTO.phoneNumber()).isPresent()) {
+            throw new RuntimeException("User already exists with phone number: ******" + registerDTO.phoneNumber().substring(6));
         }
         User user = User.builder()
-                .name(registerDTO.getName())
-                .password(passwordEncoder.encode(registerDTO.getPassword()))
-                .category(registerDTO.getBCategory())
+                .name(registerDTO.name())
+                .password(passwordEncoder.encode(registerDTO.password()))
+                .phoneNumber(registerDTO.phoneNumber())
+                .category(registerDTO.bCategory())
                 .createdAt(LocalDateTime.now())
                 .build();
 
         userRepository.save(user);
+    }
+
+    public String login(String phoneNumber) {
+        return jwtService.generateToken(phoneNumber);
     }
 }

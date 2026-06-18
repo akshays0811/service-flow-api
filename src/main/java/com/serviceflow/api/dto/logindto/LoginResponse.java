@@ -1,4 +1,4 @@
 package com.serviceflow.api.dto.logindto;
 
-public class LoginResponse {
+public record LoginResponse(String token) {
 }

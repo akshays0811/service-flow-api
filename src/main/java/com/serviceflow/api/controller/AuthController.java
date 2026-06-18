@@ -4,21 +4,28 @@ import com.serviceflow.api.dto.registerdto.RegisterDTO;
 import com.serviceflow.api.dto.logindto.LoginRequest;
 import com.serviceflow.api.dto.logindto.LoginResponse;
 import com.serviceflow.api.service.AuthService;
+import com.serviceflow.api.service.JwtService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Component
+@RestController
 @RequestMapping("/auth")
 public class AuthController {
 
-    AuthService authService;
+    private final AuthService authService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
-    public AuthController(AuthService authService){
+    public AuthController(AuthService authService, AuthenticationManager authenticationManager, JwtService jwtService) {
+        this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
         this.authService = authService;
     }
 
@@ -29,8 +36,14 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest loginRequest){
-        return ResponseEntity.status(HttpStatus.OK).body(new LoginResponse());
+    public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest request) {
+
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.phoneNumber(), request.password())
+        );
+
+        String jwtToken = authService.login(request.phoneNumber());
+        return ResponseEntity.ok(new LoginResponse(jwtToken));
     }
 
 }
