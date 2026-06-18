@@ -2,10 +2,9 @@ package com.serviceflow.api.dto.logindto;
 
 import jakarta.validation.constraints.NotBlank;
 
-public class LoginRequest {
-
+public record LoginRequest (
     @NotBlank(message = "Phone number is required")
-    String phoneNumber;
+    String phoneNumber,
     @NotBlank(message = "Password is required")
-    String password;
-}
+    String password
+) {}
