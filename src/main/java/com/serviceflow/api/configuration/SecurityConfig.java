@@ -1,7 +1,6 @@
 package com.serviceflow.api.configuration;
 
 import com.serviceflow.api.filter.securityfilter.JwtAuthFilter;
-import com.serviceflow.api.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,11 +21,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
-    private final CustomUserDetailsService customUserDetailsService;
 
-    public SecurityConfig(JwtAuthFilter jwtAuthFilter, CustomUserDetailsService customUserDetailsService) {
+    public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
         this.jwtAuthFilter = jwtAuthFilter;
-        this.customUserDetailsService = customUserDetailsService;
     }
 
     @Bean
